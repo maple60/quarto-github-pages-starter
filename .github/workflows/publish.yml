@@ -23,7 +23,7 @@ jobs:
             git config --global user.email "quarto-github-actions-publish@example.com"
             git config --global user.name "Quarto GHA Workflow Runner"
             git switch --orphan gh-pages
-            git rm -rf .
+            git rm -rf . || true
             touch .nojekyll
             git add .nojekyll
             git commit -m "chore: initialize gh-pages branch"
