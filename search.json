@@ -1,0 +1,86 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "My Website",
+    "section": "",
+    "text": "This is a Quarto website for notes, articles, project updates, and public documentation.\nReplace this text with a short explanation of who you are, what you publish, and who the site is for."
+  },
+  {
+    "objectID": "index.html#about",
+    "href": "index.html#about",
+    "title": "My Website",
+    "section": "",
+    "text": "This is a Quarto website for notes, articles, project updates, and public documentation.\nReplace this text with a short explanation of who you are, what you publish, and who the site is for."
+  },
+  {
+    "objectID": "index.html#topics",
+    "href": "index.html#topics",
+    "title": "My Website",
+    "section": "Topics",
+    "text": "Topics\n\nBlog posts: Short notes, essays, and learning logs.\nProjects: Public updates, documentation, and release notes.\nResources: Links, reading notes, and reusable references."
+  },
+  {
+    "objectID": "index.html#日本語で使う場合",
+    "href": "index.html#日本語で使う場合",
+    "title": "My Website",
+    "section": "日本語で使う場合",
+    "text": "日本語で使う場合\nこのテンプレートは日本語のブログにも使えます。\nトップページ、記事、ナビゲーション、フッターの文言を自分のサイトに合わせて書き換えてください。"
+  },
+  {
+    "objectID": "index.html#recent-posts",
+    "href": "index.html#recent-posts",
+    "title": "My Website",
+    "section": "Recent Posts",
+    "text": "Recent Posts"
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "Write a short profile here."
+  },
+  {
+    "objectID": "about.html#profile",
+    "href": "about.html#profile",
+    "title": "About",
+    "section": "",
+    "text": "Write a short profile here."
+  },
+  {
+    "objectID": "about.html#contact",
+    "href": "about.html#contact",
+    "title": "About",
+    "section": "Contact",
+    "text": "Contact\nAdd contact links, social profiles, or a GitHub link here."
+  },
+  {
+    "objectID": "about.html#license",
+    "href": "about.html#license",
+    "title": "About",
+    "section": "License",
+    "text": "License\nDescribe the license for your articles, images, and source code here."
+  },
+  {
+    "objectID": "posts.html",
+    "href": "posts.html",
+    "title": "Posts",
+    "section": "",
+    "text": "Welcome\n\n\n\nquarto\n\ngithub-pages\n\n\n\nA sample first post for this Quarto site\n\n\n\n\n\n2026-01-01\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "posts/2026-01-01-welcome/index.html",
+    "href": "posts/2026-01-01-welcome/index.html",
+    "title": "Welcome",
+    "section": "",
+    "text": "This is a sample post.\nReplace this article with your first real post, or delete it after adding your own content."
+  },
+  {
+    "objectID": "posts/2026-01-01-welcome/index.html#what-to-write",
+    "href": "posts/2026-01-01-welcome/index.html#what-to-write",
+    "title": "Welcome",
+    "section": "What to write",
+    "text": "What to write\n\nA short note\nA project update\nA learning log\nA list of useful resources\n\nQuarto supports Markdown, code blocks, figures, tables, citations, and executable code cells."
+  }
+]
