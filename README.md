@@ -140,14 +140,153 @@ quarto render
 
 ## R や Python を使う場合
 
-このテンプレートの GitHub Actions は、最初は Quarto だけをセットアップします。
+このテンプレートの GitHub Actions は、最初は Quarto だけをセットアップします。文章、画像、通常の Markdown だけなら、このままで公開できます。
 
-R や Python のコードを GitHub Actions 上で実行したい場合は、あとから workflow と依存関係ファイルを追加します。
+記事の中で R や Python のコードを実行して、その結果を HTML に入れたい場合は、GitHub Actions に実行環境を追加します。
 
-- R を使う: `r-lib/actions/setup-r` や `r-lib/actions/setup-renv` を追加する
-- Python を使う: `actions/setup-python` と `requirements.txt` を追加する
+### Python を使う
 
-まずは文章中心で公開し、必要になった時点で実行環境を足す方が管理しやすいです。
+Python コードチャンクを使う場合は、`requirements.txt` を追加します。
+
+```txt
+jupyter>=1.1.1
+pandas>=2.2
+requests>=2.32
+```
+
+`jupyter` は、Quarto が Python コードを実行するために必要です。`pandas` や `requests` は例なので、自分の記事で使うパッケージに合わせて変えてください。
+
+次に `.github/workflows/publish.yml` の `Set up Quarto` の後、`Render and publish` の前に次を追加します。
+
+```yaml
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python dependencies
+        run: python -m pip install -r requirements.txt
+```
+
+ローカルで確認する場合は、次のように環境を作ります。
+
+```bash
+python -m venv .venv
+.venv/Scripts/activate
+python -m pip install -r requirements.txt
+quarto render
+```
+
+Windows 以外では、仮想環境の有効化は次のようになります。
+
+```bash
+source .venv/bin/activate
+```
+
+`.venv/` は `.gitignore` に入っているので、GitHub には push しません。
+
+### R を簡単に使う
+
+少数の R パッケージだけを使う場合は、`DESCRIPTION` を追加するのが簡単です。
+
+```txt
+Package: mysite
+Type: Project
+Title: My Quarto Site
+Version: 0.0.1
+Imports:
+    dplyr,
+    ggplot2
+```
+
+次に `.github/workflows/publish.yml` の `Set up Quarto` の後、`Render and publish` の前に次を追加します。
+
+```yaml
+      - name: Install R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: "release"
+
+      - name: Install R dependencies
+        uses: r-lib/actions/setup-r-dependencies@v2
+```
+
+この方法では、`DESCRIPTION` の `Imports:` に書いた R パッケージが GitHub Actions 上でインストールされます。
+
+### R を renv で固定する
+
+R パッケージのバージョンを固定したい場合は、`renv` を使います。
+
+ローカルで R を開いて、次を実行します。
+
+```r
+install.packages("renv")
+renv::init()
+renv::snapshot()
+```
+
+これで `renv.lock` が作られます。`renv.lock` は GitHub に push します。
+
+GitHub Actions では、`setup-r-dependencies` の代わりに `setup-renv` を使います。
+
+```yaml
+      - name: Install R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: "release"
+
+      - name: Install R dependencies
+        uses: r-lib/actions/setup-renv@v2
+```
+
+`renv` は再現性が高い一方で、最初の設定とパッケージ管理は少し重くなります。初心者は、まず `DESCRIPTION` と `setup-r-dependencies` から始めてもよいです。
+
+### R パッケージが Ubuntu の system dependencies を必要とする場合
+
+地理空間、画像処理、数値計算系の R パッケージでは、R パッケージだけでなく Ubuntu 側のライブラリが必要になることがあります。
+
+その場合は、R パッケージを入れる前に system dependencies のステップを追加します。
+
+```yaml
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libcurl4-openssl-dev \
+            libpng-dev \
+            libjpeg-dev \
+            libtiff-dev
+```
+
+必要なライブラリは、使う R パッケージによって変わります。最初から大量に入れるより、Actions のエラーを見て必要なものを追加する方が管理しやすいです。
+
+### R と Python の両方を使う
+
+R と Python の両方を使う場合は、Python のセットアップと R のセットアップを両方入れます。順番は、どちらも `Render and publish` より前であれば大丈夫です。
+
+同じ記事の中で R と Python を混ぜる場合は、Quarto の実行エンジンや `reticulate` の扱いで詰まりやすくなります。最初は R の記事と Python の記事を分ける方が簡単です。
+
+### `maple60.github.io` の設定をそのまま使えるか
+
+`maple60.github.io` の workflow は、このテンプレートに追加する時の参考として使えます。
+
+そのまま使いやすい部分:
+
+- `actions/setup-python@v5`
+- `python -m pip install -r requirements.txt`
+- `r-lib/actions/setup-r@v2`
+- `r-lib/actions/setup-renv@v2`
+- `.venv/` を `.gitignore` に入れる考え方
+
+そのままコピーしない方がよい部分:
+
+- `requirements.txt` の中身は、使う Python パッケージに合わせて変える
+- `renv.lock` は、そのサイトの R パッケージ構成に合わせて作り直す
+- `Install system dependencies` の長いリストは、地図、画像処理、空間解析などを使う場合の設定なので、最初から全部入れなくてよい
+
+つまり、workflow の形は使えます。ただし依存関係の中身は、自分の記事で使うコードに合わせて調整してください。
+
+まずは文章中心で公開し、必要になった時点で Python または R の実行環境を足す方が管理しやすいです。
 
 ## 含まれているもの
 
@@ -220,6 +359,22 @@ GitHub の **Use this template** を使います。
 ### Actions が失敗する
 
 **Actions > Quarto Publish** を開き、失敗した実行のログを確認します。R や Python のコードを追加した場合は、必要な実行環境やパッケージが workflow に入っているか確認します。
+
+### Python コードを記事で使いたい
+
+`requirements.txt` を作り、workflow に `actions/setup-python` と `python -m pip install -r requirements.txt` を追加します。Python コードチャンクを実行するには、通常 `jupyter` も必要です。
+
+公式ドキュメント: [Using Python - Quarto](https://quarto.org/docs/computations/python.html), [Building and testing Python - GitHub Docs](https://docs.github.com/actions/guides/building-and-testing-python), [actions/setup-python](https://github.com/actions/setup-python)
+
+### R コードを記事で使いたい
+
+`DESCRIPTION` に使う R パッケージを書き、workflow に `r-lib/actions/setup-r` と `r-lib/actions/setup-r-dependencies` を追加します。パッケージのバージョンを固定したい場合は `renv.lock` を作り、`r-lib/actions/setup-renv` を使います。
+
+公式ドキュメント: [r-lib/actions](https://github.com/r-lib/actions), [renv](https://rstudio.github.io/renv/)
+
+### R パッケージのインストールで Actions が失敗する
+
+まず失敗ログを読み、足りない Ubuntu ライブラリがないか確認します。`sf`、`terra`、`magick`、画像処理、地理空間系のパッケージでは system dependencies が必要になることがあります。
 
 ### 自分の PC で確認したい
 
